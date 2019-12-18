@@ -1,5 +1,5 @@
-import React, {Component} from "react";
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import {
   StyleSheet,
   Text,
@@ -7,12 +7,12 @@ import {
   View,
   Platform,
   ViewPropTypes,
-  TouchableWithoutFeedback,
-} from 'react-native';
+  TouchableWithoutFeedback
+} from "react-native";
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-const defaultForegroundColor = '#444';
+const defaultForegroundColor = "#444";
 const defaultItemWidth = 30;
 const loggingEnabled = false;
 
@@ -20,10 +20,10 @@ const itemPropTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.any,
   style: Text.propTypes.style,
-  foregroundColor: PropTypes.string,
+  foregroundColor: PropTypes.string
 };
 const itemDefaultProps = {
-  foregroundColor: defaultForegroundColor,
+  foregroundColor: defaultForegroundColor
 };
 
 function log(message, ...optionalParams) {
@@ -33,7 +33,6 @@ function log(message, ...optionalParams) {
 }
 
 class HorizontalPickerItem extends Component {
-
   constructor(props) {
     super(props);
     this.state = intialState;
@@ -52,18 +51,16 @@ const propTypes = {
 };
 
 const defaultProps = {
-  foregroundColor: defaultForegroundColor,
+  foregroundColor: defaultForegroundColor
 };
 
 const intialState = {
   selectedItem: null,
   bounds: null,
-  padding: {left: 0, right: 0}
-
+  padding: { left: 0, right: 0 }
 };
 
 class HorizontalPicker extends Component {
-
   constructor(props) {
     super(props);
     this.state = intialState;
@@ -73,32 +70,45 @@ class HorizontalPicker extends Component {
     this.snapDelay = 200;
   }
 
-  static Item = HorizontalPickerItem
+  static Item = HorizontalPickerItem;
 
   componentWillReceiveProps(nextProps) {
-    log('componentWillReceiveProps (isScrolling:', this.isScrolling, ')', this.props.selectedValue, '->', nextProps.selectedValue);
+    log(
+      "componentWillReceiveProps (isScrolling:",
+      this.isScrolling,
+      ")",
+      this.props.selectedValue,
+      "->",
+      nextProps.selectedValue
+    );
     const valueChanged = this.props.selectedValue !== nextProps.selectedValue;
 
-    const index = this.getIndexForValue(nextProps.selectedValue, nextProps.children);
-    const previousIndex = this.getIndexForValue(nextProps.selectedValue, this.props.children);
+    const index = this.getIndexForValue(
+      nextProps.selectedValue,
+      nextProps.children
+    );
+    const previousIndex = this.getIndexForValue(
+      nextProps.selectedValue,
+      this.props.children
+    );
     const rangeChanged = index !== previousIndex;
-    log('current index', index);
-    log('previous index', previousIndex);
+    log("current index", index);
+    log("previous index", previousIndex);
 
-    log('x:', this.scrollX);
-    log('current value:', nextProps.selectedValue);
+    log("x:", this.scrollX);
+    log("current value:", nextProps.selectedValue);
     const visibleValue = this.getValueAt(this.scrollX);
     const visualsChanged = nextProps.selectedValue !== visibleValue;
-    log('visible value:', visibleValue);
+    log("visible value:", visibleValue);
 
-    log('valueChanged:', valueChanged);
-    log('rangeChanged:', rangeChanged);
-    log('visualsChanged:', visualsChanged);
+    log("valueChanged:", valueChanged);
+    log("rangeChanged:", rangeChanged);
+    log("visualsChanged:", visualsChanged);
 
     if (rangeChanged) {
       // The given children have changed
-      log('rangeChanged -> resposition');
-      if (Platform.OS === 'android') {
+      log("rangeChanged -> resposition");
+      if (Platform.OS === "android") {
         // Android fix; For some reason it only scroll a small distance. Looks
         // pretty awful and needs a better solution, this is just to fix the
         // out-of-sync issue.
@@ -109,13 +119,16 @@ class HorizontalPicker extends Component {
         this.scrollToIndex(index, false);
       }
     } else if (valueChanged) {
-      log('valueChanged -> scroll');
+      log("valueChanged -> scroll");
       this.scrollToIndex(index, true);
     } else if (visualsChanged) {
       // Check if the current value is even possible.
       // If not, we don't know where to scroll, so ignore.
-      const indexForSelectedValue = this.getIndexForValue(nextProps.selectedValue, nextProps.children);
-      log('visualsChanged -> scroll');
+      const indexForSelectedValue = this.getIndexForValue(
+        nextProps.selectedValue,
+        nextProps.children
+      );
+      log("visualsChanged -> scroll");
       if (indexForSelectedValue !== -1) {
         this.scrollToIndex(indexForSelectedValue, true);
       }
@@ -126,38 +139,40 @@ class HorizontalPicker extends Component {
     this.scrollToValue(this.props.selectedValue, false);
   }
 
-  getItemWidth = () => this.props.itemWidth && this.props.itemWidth > 0
-    ? this.props.itemWidth : defaultItemWidth;
+  getItemWidth = () =>
+    this.props.itemWidth && this.props.itemWidth > 0
+      ? this.props.itemWidth
+      : defaultItemWidth;
 
-  getComponentWidth = () =>
-    this.state.bounds ? this.state.bounds.width : 0;
+  getComponentWidth = () => (this.state.bounds ? this.state.bounds.width : 0);
 
-  getValueAt = (x) => {
+  getValueAt = x => {
     const child = this.getChildren()[this.getIndexAt(x)];
     return child ? child.props.value : null;
-  }
+  };
 
-  getIndexAt = (x) => {
+  getIndexAt = x => {
     const dx = this.getComponentWidth() / 2 - this.state.padding.left;
     return Math.floor((x + dx) / this.getItemWidth());
-  }
+  };
 
   getIndexForValue = (item, children = this.getChildren()) => {
     const index = children.findIndex(e => e.props.value === item);
-    log('getIndexForValue, value:', item, 'index:', index);
+    log("getIndexForValue, value:", item, "index:", index);
     return index;
-  }
+  };
 
-  getChildren = (children = this.props.children) => React.Children.toArray(children);
+  getChildren = (children = this.props.children) =>
+    React.Children.toArray(children);
 
   scrollToValue = (itemValue, animated = true) => {
-    log('scrollToValue ->', itemValue);
+    log("scrollToValue ->", itemValue);
     const index = this.getIndexForValue(itemValue);
     this.scrollToIndex(index, animated);
-  }
+  };
 
   scrollToIndex = (index, animated = true, initial = false) => {
-    log('scrollToIndex ->', index);
+    log("scrollToIndex ->", index);
 
     if (index < 0) {
       // Error; invalid index.
@@ -169,128 +184,146 @@ class HorizontalPicker extends Component {
     const snapX = index * this.getItemWidth();
     // Make sure the component hasn't been unmounted
     if (this.refs.scrollview) {
-      log('scroll ->', snapX);
-      this.refs.scrollview.scrollTo({x: snapX, y: 0, animated});
+      log("scroll ->", snapX);
+      this.refs.scrollview.scrollTo({ x: snapX, y: 0, animated });
 
       // iOS fix
-      if (!initial && Platform.OS === 'ios') {
-        log('ignoreNextScroll');
+      if (!initial && Platform.OS === "ios") {
+        log("ignoreNextScroll");
         this.ignoreNextScroll = true;
       }
     }
-  }
+  };
 
-  onScroll = (event) => {
+  onScroll = event => {
     // Sometimes onMomentumScrollBegin event seems to be missing and onMomentumScrollEnd
     // is sent twice. However, if we receive an onScroll after onMomentumScrollEnd, we
     // can assume that the momentum scroll is continued.
     this.isScrolling = true;
     this.scrollX = event.nativeEvent.contentOffset.x;
-    log('onScroll, x:', this.scrollX);
+    log("onScroll, x:", this.scrollX);
     this.cancelDelayedSnap();
-  }
+  };
 
-  onScrollBeginDrag = (event) => {
-    log('onScrollBeginDrag', this.scrollStart);
+  onScrollBeginDrag = event => {
+    log("onScrollBeginDrag", this.scrollStart);
     this.isScrolling = true;
     this.scrollStart = event.nativeEvent.contentOffset.x;
     this.cancelDelayedSnap();
     this.ignoreNextScroll = false;
-  }
+  };
 
   onScrollEndDrag = (/*event*/) => {
-    log('onScrollEnd');
+    log("onScrollEnd");
     this.isScrolling = false;
     if (this.ignoreNextScroll) {
-      log('onScrollEnd, ignored');
+      log("onScrollEnd, ignored");
       this.ignoreNextScroll = false;
       return;
     }
     this.delayedSnap();
-  }
+  };
 
-  onMomentumScrollBegin = (event) => {
-    log('onMomentumScrollBegin', event.nativeEvent);
+  onMomentumScrollBegin = event => {
+    log("onMomentumScrollBegin", event.nativeEvent);
     this.isScrolling = true;
     this.cancelDelayedSnap();
-  }
+  };
 
   onMomentumScrollEnd = (/*event*/) => {
-    log('onMomentumScrollEnd');
+    log("onMomentumScrollEnd");
     this.isScrolling = false;
     if (this.ignoreNextScroll) {
-      log('onMomentumScrollEnd, ignored');
+      log("onMomentumScrollEnd, ignored");
       this.ignoreNextScroll = false;
       return;
     }
     this.delayedSnap();
-  }
+  };
 
   delayedSnap = () => {
-    log('delayedSnap, cancelling previous...');
+    log("delayedSnap, cancelling previous...");
     this.cancelDelayedSnap();
-    log('scheduling the snap');
-    log('delayedSnap');
-    this.snapNoMomentumTimeout =
-      setTimeout(() => {
-        const index = this.getIndexAt(this.scrollX);
-        const item = this.getChildren()[index];
-        log('doing the snap ->', item.props.value);
-        this.onChange(item.props.value);
-        this.scrollToIndex(index);
-      }, this.snapDelay);
-  }
+    log("scheduling the snap");
+    log("delayedSnap");
+    this.snapNoMomentumTimeout = setTimeout(() => {
+      const index = this.getIndexAt(this.scrollX);
+      const item = this.getChildren()[index];
+      log("doing the snap ->", item.props.value);
+      this.onChange(item.props.value);
+      this.scrollToIndex(index);
+    }, this.snapDelay);
+  };
 
   cancelDelayedSnap = () => {
     if (this.snapNoMomentumTimeout) {
-      log('cancelled the delayed snap');
-      log('cancelDelayedSnap');
+      log("cancelled the delayed snap");
+      log("cancelDelayedSnap");
       clearTimeout(this.snapNoMomentumTimeout);
       this.snapNoMomentumTimeout = null;
     }
-  }
+  };
 
-  onChange = (itemValue) => {
-    log('onChange', itemValue);
+  onChange = itemValue => {
+    log("onChange", itemValue);
     if (this.props.onChange) {
       this.props.onChange(itemValue);
     }
-  }
+  };
 
-  handleItemPress = (value) => {
+  handleItemPress = value => {
     return () => {
       if (value && this.props.onChange) {
         this.props.onChange(value);
       }
     };
-  }
+  };
 
-  renderChildren = (children) => {
+  renderChildren = children => {
     return children.map(this.renderChild);
-  }
+  };
 
-  renderChild = (child) => {
+  renderChild = child => {
     const itemValue = child.props.value;
     const color = this.props.foregroundColor || defaultForegroundColor;
-    const opacity = this.props.inactiveItemOpacity && itemValue !== this.props.selectedValue ? this.props.inactiveItemOpacity : 1
+    const opacity =
+      this.props.inactiveItemOpacity && itemValue !== this.props.selectedValue
+        ? this.props.inactiveItemOpacity
+        : 1;
     return (
-      <TouchableWithoutFeedback key={itemValue} onPress={this.handleItemPress(itemValue)}>
-        <View style={[styles.itemContainer, {width: this.getItemWidth()}]}>
-          <Text style={[styles.itemText, child.props.style, {color, opacity}]}>{child.props.label}</Text>
+      <TouchableWithoutFeedback
+        key={itemValue}
+        onPress={this.handleItemPress(itemValue)}
+      >
+        <View style={[styles.itemContainer, { width: this.getItemWidth() }]}>
+          <Text
+            style={[styles.itemText, child.props.style, { color, opacity }]}
+          >
+            {child.props.label}
+          </Text>
+          <Text
+            style={[styles.itemText, child.props.style, { color, opacity }]}
+          >
+            {child.props.label}
+          </Text>
         </View>
       </TouchableWithoutFeedback>
     );
-  }
+  };
 
-  onLayout = (event) => {
-    log('onLayout');
-    const {nativeEvent: {layout: {x, y, width, height}}} = event;
-    const bounds = {width, height};
+  onLayout = event => {
+    log("onLayout");
+    const {
+      nativeEvent: {
+        layout: { x, y, width, height }
+      }
+    } = event;
+    const bounds = { width, height };
     const leftItemWidth = this.getItemWidth();
     const rightItemWidth = this.getItemWidth();
     const padding = {
-      left: !bounds ? 0 : ((bounds.width - leftItemWidth) / 2),
-      right: !bounds ? 0 : ((bounds.width - rightItemWidth) / 2)
+      left: !bounds ? 0 : (bounds.width - leftItemWidth) / 2,
+      right: !bounds ? 0 : (bounds.width - rightItemWidth) / 2
     };
 
     this.setState({
@@ -299,16 +332,14 @@ class HorizontalPicker extends Component {
     });
 
     const index = this.getIndexForValue(this.props.selectedValue);
-    log('onLayout -> scrollToIndex');
+    log("onLayout -> scrollToIndex");
     this.scrollToIndex(index, false);
-  }
+  };
 
   renderDefaultOverlay = () => {
     const color = this.props.foregroundColor;
-    return (
-      <View style={{flex: 1}} />
-    );
-  }
+    return <View style={{ flex: 1 }} />;
+  };
 
   render() {
     const bounds = this.state.bounds;
@@ -316,10 +347,13 @@ class HorizontalPicker extends Component {
     return (
       <View style={[this.props.style]}>
         <ScrollView
-          ref='scrollview'
-          decelerationRate={'fast'}
+          ref="scrollview"
+          decelerationRate={"fast"}
           scrollEventThrottle={16}
-          contentContainerStyle={{paddingLeft: this.state.padding.left, paddingRight: this.state.padding.right}}
+          contentContainerStyle={{
+            paddingLeft: this.state.padding.left,
+            paddingRight: this.state.padding.right
+          }}
           showsHorizontalScrollIndicator={false}
           horizontal={true}
           onScroll={this.onScroll}
@@ -328,13 +362,14 @@ class HorizontalPicker extends Component {
           onMomentumScrollBegin={this.onMomentumScrollBegin}
           onMomentumScrollEnd={this.onMomentumScrollEnd}
           onLayout={this.onLayout}
-          style={this.scrollView}>
+          style={this.scrollView}
+        >
           <View style={styles.contentContainer}>
             {bounds && this.renderChildren(this.props.children)}
           </View>
         </ScrollView>
-        <View style={styles.overlay} pointerEvents='none'>
-          <View style={[{flex: 1, width: this.getItemWidth()}]}>
+        <View style={styles.overlay} pointerEvents="none">
+          <View style={[{ flex: 1, width: this.getItemWidth() }]}>
             {renderOverlay()}
           </View>
         </View>
@@ -349,40 +384,40 @@ var styles = StyleSheet.create({
   },
   touchArea: {
     flex: 1,
-    alignSelf: 'stretch',
+    alignSelf: "stretch"
   },
   scrollView: {
     flex: 1
   },
   contentContainer: {
-    flexDirection: 'row'
+    flexDirection: "row"
   },
   itemContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: "center",
+    alignItems: "center"
   },
   item: {
-    flexDirection: 'column',
+    flexDirection: "column",
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    backgroundColor: 'yellow'
+    alignItems: "center",
+    justifyContent: "flex-end",
+    backgroundColor: "yellow"
   },
   itemText: {
     fontSize: 20,
-    textAlign: 'center'
+    textAlign: "center"
   },
   overlay: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
-    flexDirection: 'column',
+    flexDirection: "column",
     flex: 1,
-    alignItems: 'center'
+    alignItems: "center"
   }
 });
 
