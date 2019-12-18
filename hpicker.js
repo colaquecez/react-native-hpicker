@@ -1,30 +1,16 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import {
   StyleSheet,
   Text,
   ScrollView,
   View,
   Platform,
-  ViewPropTypes,
   TouchableWithoutFeedback
 } from "react-native";
-
-import PropTypes from "prop-types";
 
 const defaultForegroundColor = "#444";
 const defaultItemWidth = 30;
 const loggingEnabled = false;
-
-const itemPropTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.any,
-  style: Text.propTypes.style,
-  foregroundColor: PropTypes.string
-};
-const itemDefaultProps = {
-  foregroundColor: defaultForegroundColor
-};
 
 function log(message, ...optionalParams) {
   if (loggingEnabled) {
@@ -38,21 +24,6 @@ class HorizontalPickerItem extends Component {
     this.state = intialState;
   }
 }
-
-const propTypes = {
-  style: ViewPropTypes.style,
-  selectedValue: PropTypes.any,
-  children: PropTypes.array, // TODO: Make it HorizontalPicker.Item[]
-  itemWidth: PropTypes.number.isRequired,
-  onChange: PropTypes.func,
-  renderOverlay: PropTypes.func,
-  foregroundColor: PropTypes.string,
-  inactiveItemOpacity: PropTypes.number
-};
-
-const defaultProps = {
-  foregroundColor: defaultForegroundColor
-};
 
 const intialState = {
   selectedItem: null,
@@ -420,11 +391,5 @@ var styles = StyleSheet.create({
     alignItems: "center"
   }
 });
-
-HorizontalPickerItem.propTypes = itemPropTypes;
-HorizontalPickerItem.defaultProps = itemDefaultProps;
-
-HorizontalPicker.propTypes = propTypes;
-HorizontalPicker.defaultProps = defaultProps;
 
 export default HorizontalPicker;
