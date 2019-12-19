@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   View,
+  Image,
   Platform,
   TouchableWithoutFeedback
 } from "react-native";
@@ -28,7 +29,8 @@ class HorizontalPickerItem extends Component {
 const intialState = {
   selectedItem: null,
   bounds: null,
-  padding: { left: 0, right: 0 }
+  padding: { left: 0, right: 0 },
+  result: ""
 };
 
 class HorizontalPicker extends Component {
@@ -43,7 +45,7 @@ class HorizontalPicker extends Component {
 
   static Item = HorizontalPickerItem;
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(nextProps) {
     log(
       "componentWillReceiveProps (isScrolling:",
       this.isScrolling,
@@ -92,7 +94,7 @@ class HorizontalPicker extends Component {
     } else if (valueChanged) {
       log("valueChanged -> scroll");
       this.scrollToIndex(index, true);
-    } else if (visualsChanged) {
+    } else if (!this.isScrolling && visualsChanged) {
       // Check if the current value is even possible.
       // If not, we don't know where to scroll, so ignore.
       const indexForSelectedValue = this.getIndexForValue(
@@ -223,6 +225,7 @@ class HorizontalPicker extends Component {
       log("doing the snap ->", item.props.value);
       this.onChange(item.props.value);
       this.scrollToIndex(index);
+      this.setState({ result: item.props.result });
     }, this.snapDelay);
   };
 
@@ -255,28 +258,38 @@ class HorizontalPicker extends Component {
   };
 
   renderChild = child => {
+    const index = this.getIndexAt(this.scrollX);
+    const item = this.getChildren()[index];
+
     const itemValue = child.props.value;
     const color = this.props.foregroundColor || defaultForegroundColor;
-    const opacity =
-      this.props.inactiveItemOpacity && itemValue !== this.props.selectedValue
-        ? this.props.inactiveItemOpacity
-        : 1;
+    const imageSize =
+      item.props.value == child.props.value
+        ? { width: 100, height: 100 }
+        : { width: 50, height: 50 };
     return (
       <TouchableWithoutFeedback
         key={itemValue}
-        onPress={this.handleItemPress(itemValue)}
+        onPress={v => this.handleItemPress(v)}
       >
         <View style={[styles.itemContainer, { width: this.getItemWidth() }]}>
-          <Text
-            style={[styles.itemText, child.props.style, { color, opacity }]}
-          >
-            {child.props.label}
-          </Text>
-          <Text
-            style={[styles.itemText, child.props.style, { color, opacity }]}
-          >
-            {child.props.label}
-          </Text>
+          <View>
+            {/* <Text style={[styles.itemText, child.props.style, {color}]}>{child.props.label}</Text> */}
+            <Image
+              source={{
+                uri:
+                  "https://img.rankedboost.com/wp-content/uploads/2019/06/B.F.-Sword-Teamfight-Tactics.png"
+              }}
+              style={[imageSize, { marginBottom: 20 }]}
+            />
+            <Image
+              source={{
+                uri:
+                  "https://img.rankedboost.com/wp-content/uploads/2019/06/Blade-of-the-Ruined-King-Teamfight-Tactics.png"
+              }}
+              style={imageSize}
+            />
+          </View>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -307,16 +320,18 @@ class HorizontalPicker extends Component {
     this.scrollToIndex(index, false);
   };
 
-  renderDefaultOverlay = () => {
-    const color = this.props.foregroundColor;
-    return <View style={{ flex: 1 }} />;
-  };
+  //   renderDefaultOverlay = () => {
+  //     const color = this.props.foregroundColor;
+  //     return (
+  //       <View style={{flex: 1, borderLeftWidth: 1, borderRightWidth: 1,borderColor:'red'}} />
+  //     );
+  //   }
 
   render() {
     const bounds = this.state.bounds;
-    const renderOverlay = this.props.renderOverlay || this.renderDefaultOverlay;
+    // const renderOverlay = this.props.renderOverlay || this.renderDefaultOverlay;
     return (
-      <View style={[this.props.style]}>
+      <View style={([this.props.style], { flex: 1 })}>
         <ScrollView
           ref="scrollview"
           decelerationRate={"fast"}
@@ -339,9 +354,13 @@ class HorizontalPicker extends Component {
             {bounds && this.renderChildren(this.props.children)}
           </View>
         </ScrollView>
+        <View></View>
+        <View>
+          <Text style={{ fontSize: 20 }}>{this.state.result}</Text>
+        </View>
         <View style={styles.overlay} pointerEvents="none">
           <View style={[{ flex: 1, width: this.getItemWidth() }]}>
-            {renderOverlay()}
+            {/* {renderOverlay()} */}
           </View>
         </View>
       </View>
